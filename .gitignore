@@ -1,4 +1,4 @@
 *.exe
 *.o
-qs.inp
-qs.out
+*.inp
+*.out
