@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Mastermind</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --board-color: #34495e;
+            --text-color: #ecf0f1;
+            /* 6 màu sắc tương ứng với 6 giá trị từ 1 đến 6 */
+            --c1: #e74c3c; /* Đỏ */
+            --c2: #3498db; /* Xanh dương */
+            --c3: #2ecc71; /* Xanh lá */
+            --c4: #f1c40f; /* Vàng */
+            --c5: #9b59b6; /* Tím */
+            --c6: #e67e22; /* Cam */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            margin-top: 0;
+            font-size: 14px;
+            color: #bdc3c7;
+            text-align: center;
+        }
+
+        #game-board {
+            background-color: var(--board-color);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            width: 320px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .guess-slots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .slot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #7f8c8d;
+            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: transparent; /* Ẩn số, chỉ nhìn màu cho giống game thật */
+        }
+
+        .feedback-slots {
+            display: grid;
+            grid-template-columns: 15px 15px;
+            grid-template-rows: 15px 15px;
+            gap: 3px;
+        }
+
+        .peg {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #95a5a6;
+        }
+        
+        /* Chấm đen: R1 (Đúng màu, đúng vị trí) */
+        .peg.black { background-color: #111; border: 1px solid #000; }
+        /* Chấm trắng: R2 (Đúng màu, sai vị trí) */
+        .peg.white { background-color: #fff; border: 1px solid #ccc; }
+
+        /* Khu vực điều khiển */
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 320px;
+        }
+
+        #current-guess {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background-color: var(--board-color);
+            border-radius: 8px;
+        }
+
+        #color-picker {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .color-btn:hover { transform: scale(1.1); }
+        .color-btn:active { transform: scale(0.9); }
+
+        .btn-action {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        #btn-delete { background-color: #e74c3c; }
+        #btn-submit { background-color: #2ecc71; }
+        #btn-restart { background-color: #3498db; margin-top: 20px; display: none; }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            height: 24px;
+        }
+
+        /* Gán màu động bằng class */
+        .val-1 { background-color: var(--c1); color: white;}
+        .val-2 { background-color: var(--c2); color: white;}
+        .val-3 { background-color: var(--c3); color: white;}
+        .val-4 { background-color: var(--c4); color: white;}
+        .val-5 { background-color: var(--c5); color: white;}
+        .val-6 { background-color: var(--c6); color: white;}
+
+    </style>
+</head>
+<body>
+
+    <h1>Mastermind</h1>
+    <p class="subtitle">Giải mã 4 màu bí ẩn trong tối đa 10 lượt.<br>Chấm Đen (R1) = Đúng vị trí | Chấm Trắng (R2) = Sai vị trí</p>
+
+    <div id="game-board">
+        <!-- Lịch sử các lượt đoán sẽ được thêm vào đây bằng JavaScript -->
+    </div>
+
+    <div id="controls">
+        <div id="current-guess">
+            <div class="slot" id="cg-0"></div>
+            <div class="slot" id="cg-1"></div>
+            <div class="slot" id="cg-2"></div>
+            <div class="slot" id="cg-3"></div>
+        </div>
+
+        <div id="color-picker">
+            <button class="color-btn val-1" onclick="selectColor(1)"></button>
+            <button class="color-btn val-2" onclick="selectColor(2)"></button>
+            <button class="color-btn val-3" onclick="selectColor(3)"></button>
+            <button class="color-btn val-4" onclick="selectColor(4)"></button>
+            <button class="color-btn val-5" onclick="selectColor(5)"></button>
+            <button class="color-btn val-6" onclick="selectColor(6)"></button>
+        </div>
+
+        <div class="action-group">
+            <button class="btn-action" id="btn-delete" onclick="deleteColor()">Xóa</button>
+            <button class="btn-action" id="btn-submit" onclick="submitGuess()">Đoán</button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+    <button class="btn-action" id="btn-restart" onclick="initGame()">Chơi Ván Mới</button>
+
+    <script>
+        let secretCode = [];
+        let currentGuess = [];
+        let attempts = 0;
+        const maxAttempts = 10;
+        let isGameOver = false;
+
+        // Sinh số ngẫu nhiên từ min đến max
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Khởi tạo trò chơi mới
+        function initGame() {
+            secretCode = [];
+            for (let i = 0; i < 4; i++) {
+                secretCode.push(randomInt(1, 6));
+            }
+            
+            currentGuess = [];
+            attempts = 0;
+            isGameOver = false;
+            
+            document.getElementById('game-board').innerHTML = '';
+            document.getElementById('message').innerText = '';
+            document.getElementById('message').style.color = 'white';
+            document.getElementById('btn-restart').style.display = 'none';
+            document.getElementById('color-picker').style.opacity = '1';
+            
+            updateCurrentGuessUI();
+            
+            // Xóa dòng này nếu không muốn ăn gian xem trước đáp án trong Console
+            console.log("Đáp án bí mật (Dành cho nhà phát triển):", secretCode);
+        }
+
+        // Chọn một màu
+        function selectColor(val) {
+            if (isGameOver || currentGuess.length >= 4) return;
+            currentGuess.push(val);
+            updateCurrentGuessUI();
+        }
+
+        // Xóa màu vừa chọn
+        function deleteColor() {
+            if (isGameOver || currentGuess.length === 0) return;
+            currentGuess.pop();
+            updateCurrentGuessUI();
+        }
+
+        // Cập nhật giao diện thanh nhập liệu
+        function updateCurrentGuessUI() {
+            for (let i = 0; i < 4; i++) {
+                let slot = document.getElementById(`cg-${i}`);
+                slot.className = 'slot'; // Reset class
+                if (i < currentGuess.length) {
+                    slot.classList.add(`val-${currentGuess[i]}`);
+                }
+            }
+        }
+
+        // Tính R1 và R2 (Chuyển thể nguyên bản từ logic C++ đã tối ưu)
+        function calculateFeedback(guess, answer) {
+            let r1 = 0;
+            let r2 = 0;
+            let isValid = [false, false, false, false];
+            let remainingAnsFreq = {};
+
+            // Bước 1: Tính R1 (Khớp hoàn toàn)
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === answer[i]) {
+                    r1++;
+                    isValid[i] = true;
+                }
+            }
+
+            // Đếm tần số các phần tử chưa được khớp ở R1
+            for (let i = 0; i < 4; i++) {
+                if (!isValid[i]) {
+                    remainingAnsFreq[answer[i]] = (remainingAnsFreq[answer[i]] || 0) + 1;
+                }
+            }
+
+            // Bước 2: Tính R2 (Đúng màu, sai vị trí)
+            for (let i = 0; i < 4; i++) {
+                if (!isValid[i]) {
+                    let guessedColor = guess[i];
+                    if (remainingAnsFreq[guessedColor] > 0) {
+                        r2++;
+                        remainingAnsFreq[guessedColor]--;
+                    }
+                }
+            }
+
+            return { r1, r2 };
+        }
+
+        // Gửi lượt đoán
+        function submitGuess() {
+            if (isGameOver) return;
+            if (currentGuess.length < 4) {
+                document.getElementById('message').innerText = 'Vui lòng chọn đủ 4 màu!';
+                document.getElementById('message').style.color = '#f1c40f';
+                setTimeout(() => {
+                    if(!isGameOver) document.getElementById('message').innerText = '';
+                }, 2000);
+                return;
+            }
+
+            attempts++;
+            let feedback = calculateFeedback(currentGuess, secretCode);
+            renderRow(currentGuess, feedback);
+
+            if (feedback.r1 === 4) {
+                endGame(true);
+            } else if (attempts >= maxAttempts) {
+                endGame(false);
+            }
+
+            // Reset thanh nhập liệu cho lượt tiếp theo
+            currentGuess = [];
+            updateCurrentGuessUI();
+        }
+
+        // Vẽ dòng lịch sử lên bảng
+        function renderRow(guess, feedback) {
+            let board = document.getElementById('game-board');
+            let row = document.createElement('div');
+            row.className = 'row';
+
+            // Khu vực chứa 4 viên màu vừa đoán
+            let guessSlots = document.createElement('div');
+            guessSlots.className = 'guess-slots';
+            for (let i = 0; i < 4; i++) {
+                let slot = document.createElement('div');
+                slot.className = `slot val-${guess[i]}`;
+                guessSlots.appendChild(slot);
+            }
+
+            // Khu vực chứa cọc R1, R2
+            let feedbackSlots = document.createElement('div');
+            feedbackSlots.className = 'feedback-slots';
+            
+            // Thêm cọc đen (R1)
+            for (let i = 0; i < feedback.r1; i++) {
+                let peg = document.createElement('div');
+                peg.className = 'peg black';
+                feedbackSlots.appendChild(peg);
+            }
+            // Thêm cọc trắng (R2)
+            for (let i = 0; i < feedback.r2; i++) {
+                let peg = document.createElement('div');
+                peg.className = 'peg white';
+                feedbackSlots.appendChild(peg);
+            }
+            // Lấp đầy các cọc rỗng còn lại
+            let emptyPegs = 4 - feedback.r1 - feedback.r2;
+            for (let i = 0; i < emptyPegs; i++) {
+                let peg = document.createElement('div');
+                peg.className = 'peg';
+                feedbackSlots.appendChild(peg);
+            }
+
+            row.appendChild(guessSlots);
+            row.appendChild(feedbackSlots);
+            
+            // Thêm dòng mới lên trên cùng của bảng
+            board.insertBefore(row, board.firstChild);
+        }
+
+        // Kết thúc trò chơi
+        function endGame(isWin) {
+            isGameOver = true;
+            document.getElementById('color-picker').style.opacity = '0.5';
+            let msgEl = document.getElementById('message');
+            
+            if (isWin) {
+                msgEl.innerText = `Chúc mừng! Bạn thắng sau ${attempts} lượt.`;
+                msgEl.style.color = '#2ecc71';
+            } else {
+                msgEl.innerText = 'Bạn đã thua! Đáp án là màu của các số: ' + secretCode.join(', ');
+                msgEl.style.color = '#e74c3c';
+            }
+            
+            document.getElementById('btn-restart').style.display = 'block';
+        }
+
+        // Chạy game khi vừa tải trang
+        window.onload = initGame;
+    </script>
+</body>
+</html>
