@@ -39,7 +39,7 @@ void inp()
 namespace sub1
 {
     int sz[N], h[N], par[N];
-    void dfs(int u, int p)
+    void dfs(int u, int p) 
     {
         sz[u] = 1;
         for(int v : adj[u]) if(v != p) {
@@ -53,7 +53,7 @@ namespace sub1
     struct SegmentTree {
         int st[4 * N], lz[4 * N];
 
-        void down(int id, int l, int mid, int r)
+        void down(int id, int l, int mid, int r) 
         {
             if(lz[id]) {
                 int val = lz[id];
@@ -63,7 +63,7 @@ namespace sub1
                 lz[id] = 0;
             }
         }
-        void upd(int id, int l, int r, int u, int v, int val)
+        void upd(int id, int l, int r, int u, int v, int val) 
         {
             if(r < u || v < l) return;
             if(u <= l && r <= v) {
@@ -77,15 +77,15 @@ namespace sub1
             upd(id << 1 | 1, mid + 1, r, u, v, val);
             st[id] = st[id << 1] + st[id << 1 | 1];
         }
-        int get(int id, int l, int r, int u, int v)
+        int get(int id, int l, int r, int pos) 
         {
-            if(r < u || v < l) return 0;
-            if(u <= l && r <= v) return st[id];
+            if(pos > r || pos < l) return 0;
+            if(l == r) return st[id];
             int mid = (r + l) >> 1;
             down(id, l, mid, r);
-            return get(id << 1, l, mid, u, v) + get(id << 1 | 1, mid + 1, r, u, v);
+            return get(id << 1, l, mid, pos) + get(id << 1 | 1, mid + 1, r, pos);
         }
-        int walk(int id, int l, int r, int u, int v, int val)
+        int walk(int id, int l, int r, int u, int v, int val) 
         {
             if(r < u || v < l || st[id] < val) return -1;
             if(l == r) return l;
@@ -98,7 +98,7 @@ namespace sub1
 
     int head[N], chainID[N], mtc = 1, pos[N], euler[N], time = 0, in[N], out[N];
 
-    void hld(int u, int p)
+    void hld(int u, int p) 
     {
         if(!head[mtc]) {
             head[mtc] = u;
@@ -122,49 +122,41 @@ namespace sub1
         out[u] = time;
     }
 
-    void update(int x, int sum)
-    {
-        while(chainID[x] != chainID[1]) {
-            itSum.upd(1, 1, n, pos[head[chainID[x]]], pos[x], -sum);
-            x = par[head[chainID[x]]];
-        }
-        itSum.upd(1, 1, n, 1, pos[x], -sum);
-    }
-
-    int getPar(int x)
+    void updAdd(int x) 
     {
         while(chainID[x] != chainID[1]) {
             int far = itCut.walk(1, 1, n, pos[head[chainID[x]]], pos[x], 1);
-            if(far != -1) return far;
+            itSum.upd(1, 1, n, far != -1 ? far : pos[head[chainID[x]]], pos[x], 1);
+            if(far != -1) return;
             x = par[head[chainID[x]]];
         }
         int far = itCut.walk(1, 1, n, 1, pos[x], 1);
-        return far;
+        itSum.upd(1, 1, n, far != -1 ? far : 1, pos[x], 1);
     }
-    void updAdd(int u)
+    void updCut(int x) 
     {
-        itSum.upd(1, 1, n, in[u], in[u], 1);
-        int p = getPar(u);
-        if(p != -1) {
-            update(par[p], -1);
-        }
-    }
-    void updCut(int x)
-    {
-        int sumSub = itSum.get(1, 1, n, in[x], out[x]);
-        update(par[x], sumSub);
+        itCut.upd(1, 1, n, pos[x], pos[x], 1);
 
-        itCut.upd(1, 1, n, in[x], in[x], 1);
+        int val = itSum.get(1, 1, n, pos[x]);
+        x = par[x];
+        while(chainID[x] != chainID[1]) {
+            int far = itCut.walk(1, 1, n, pos[head[chainID[x]]], pos[x], 1);
+            itSum.upd(1, 1, n, far != -1 ? far : pos[head[chainID[x]]], pos[x], -val);
+            if(far != -1) return;
+            x = par[head[chainID[x]]];
+        }
+        int far = itCut.walk(1, 1, n, 1, pos[x], 1);
+        itSum.upd(1, 1, n, far != -1 ? far : 1, pos[x], -val);
     }
-    int getAns(int x)
+    int getAns(int x) 
     {
-        return itSum.get(1, 1, n, in[x], out[x]);
+        return itSum.get(1, 1, n, pos[x]);
     }
     void slv()
     {
-        dfs(1, 0);
-        hld(1, 0);
-        itSum.upd(1, 1, n, 1, 1, 1);
+        dfs(1, 0); 
+        hld(1, 0); 
+        itSum.upd(1, 1, n, pos[1], pos[1], 1);
         FOR(t, 1, q) {
             char type = qry[t].type;
             int x = qry[t].x;
