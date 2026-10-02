@@ -21,7 +21,7 @@ int n, q, a[N];
 vector<int> adj[N];
 
 void inp()
-{
+{   
     cin >> n >> q;
     FOR(i, 1, n) cin >> a[i];
     FOR(i, 1, n - 1) {
@@ -37,7 +37,7 @@ namespace sub1
 
     int in[N], out[N], timer = 0, euler[N];
     int up[N][21], h[N];
-    void dfs(int u, int p)
+    void dfs(int u, int p) 
     {
         in[u] = ++timer;
         euler[timer] = u;
@@ -50,7 +50,7 @@ namespace sub1
         }
         out[u] = timer;
     }
-    int LCA(int u, int v)
+    int LCA(int u, int v) 
     {
         if(h[u] < h[v]) swap(u, v);
         FORD(j, lg(n), 0) if(h[up[u][j]] >= h[v]) {
@@ -65,7 +65,7 @@ namespace sub1
     }
     int cnt[N];
     int ans, SZ;
-    void add(int u)
+    void add(int u) 
     {
         cnt[a[u]]++;
         if(cnt[a[u]] * 2 > SZ) ans = a[u];
@@ -74,7 +74,7 @@ namespace sub1
     vector<int> vec;
 
     int sum[N][BLOCK + 10];
-    void dfsAdd(int u, int p, int id, int color)
+    void dfsAdd(int u, int p, int id, int color) 
     {
         sum[u][id] = sum[p][id];
         if(a[u] == color) sum[u][id]++;
@@ -82,18 +82,18 @@ namespace sub1
             dfsAdd(v, u, id, color);
         }
     }
-    void del(int l, int r)
+    void del(int l, int r) 
     {
         FOR(i, l, r) cnt[a[euler[i]]]--;
     }
     int pre[N][BLOCK + 10];
 
-    int dist(int x, int y)
+    int dist(int x, int y) 
     {
         return h[x] + h[y] - 2 * h[LCA(x, y)];
     }
     void slv()
-    {
+    {        
         FOR(i, 1, n) {
             cnt[a[i]]++;
             if(cnt[a[i]] == BLOCK) vec.push_back(a[i]);
@@ -120,7 +120,7 @@ namespace sub1
                 ans = -1;
                 SZ = out[u] - in[u] + 1;
                 if(SZ < BLOCK * 2) {
-                    FOR(i, in[u], out[u]) add(euler[i]);
+                    FOR(i, in[u], out[u]) add(euler[i]); 
                     del(in[u], out[u]);
                 }
                 else {
@@ -151,7 +151,7 @@ namespace sub1
                             ans = vec[i];
                             break;
                         }
-                    }
+                    } 
                 }
                 cout << ans << el;
             }

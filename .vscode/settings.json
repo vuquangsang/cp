@@ -1,3 +1,14 @@
 {
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    
+    // Kéo dài lịch sử Terminal để in các bảng test lớn không bị cắt cụt
+    "terminal.integrated.scrollback": 20000,
+
+    // Hiển thị ký hiệu nối toán tử đẹp mắt (cần cài font Fira Code hoặc JetBrains Mono)
+    "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+
+    // Hiệu ứng con trỏ lướt mượt mà giảm mỏi mắt khi code lâu
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on"
 }

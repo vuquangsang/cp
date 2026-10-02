@@ -97,47 +97,6 @@ namespace sub1
     }
 }
 
-//namespace sub_trau
-//{
-//    bool isDel[N];
-//    ll calc(string str)
-//    {
-//        int sz = str.size() - 1;
-//        ll total = 0;
-//        FOR(i, 1, sz) {
-//            if(s[i] == '1') {
-//                cout << (1LL << (i - 1)) << el;
-//                total += (1LL << (i - 1));
-//            }
-//        }
-//        return total;
-//    }
-//    void slv()
-//    {
-//        string tmp = " 10011";
-//        cout << calc(tmp); return;
-//        int ans = 1e9 + 2;
-//        FOR(msk, 0, (1 << n) - 1) {
-//            FOR(i, 1, n) isDel[i] = 0;
-//            FOR(i, 0, n - 1) if(msk >> i & 1) {
-//                isDel[i + 1] = 1;
-//            }
-//            if(isDel[n]) continue;
-//
-//            string str = " ";
-//
-//            FOR(i, 1, n) if(!isDel[i]) str += s[i];
-//
-//            if(calc(str) <= K) {
-//                mini(ans, __builtin_popcount(msk));
-//                cout << str << " " << __builtin_popcount(msk) << " ";
-//                cout << calc(str) << el;
-//            }
-//        }
-//        cout << ans;
-//    }
-//}
-
 main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);

@@ -14,7 +14,10 @@
                 "echo": false,
                 "showReuseMessage": false
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${fileDirname}"]
+            }
         }
     ]
 }
