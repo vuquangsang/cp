@@ -15,6 +15,15 @@ using namespace std;
 template <class T> bool maxi(T &x, T y) { if(x < y) { x = y ; return true ;} return false;}
 template <class T> bool mini(T &x, T y) { if(x > y) { x = y ; return true ;} return false;}
 
+/*
+    Nhận xét quan trọng nhất của bài : chỉ có tối đa sqrt(n) số có tần số >= BLOCK = sqrt(n)
+    push vô 1 vec
+    => 1 đoạn có SZ > BLOCK * 2 thì chắc chắn màu phải thuộc vec
+    đoạn có SZ <= BLOCK * 2 thì duyệt btg ~ q * 2 * BLOCK
+    => O(q * sqrt(n))
+*/
+
+
 const int N = 5e4 + 2;
 
 int n, q, a[N];

@@ -22,9 +22,9 @@ Phimtat {
 
 addGit
 {
-    git add .
-    git commit -m "vqs"
-    git push origin main
+git add .
+git commit -m "vqs"
+git push origin main
 }
 
 Latex
