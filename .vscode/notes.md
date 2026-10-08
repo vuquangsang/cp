@@ -1,4 +1,5 @@
 Phimtat {
+
     Alt + ↑ / ↓: Di chuyển cả dòng code hiện tại lên hoặc xuống.
 
     Shift + Alt + ↑ / ↓: Nhân bản (copy & paste) dòng code hiện tại lên trên hoặc xuống dưới.
